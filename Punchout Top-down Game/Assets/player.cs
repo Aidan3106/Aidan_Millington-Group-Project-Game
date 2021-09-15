@@ -10,6 +10,7 @@ public class player : MonoBehaviour
     float vertical;
     float origYPosition;
 
+    public float HP = 100.0f;
     public float runSpeed = 10.0f;
 
     // Bullet part
