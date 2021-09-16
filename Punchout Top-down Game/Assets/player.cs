@@ -10,20 +10,29 @@ public class player : MonoBehaviour
     float vertical;
     float origYPosition;
 
-    public float HP = 100.0f;
-    public float runSpeed = 10.0f;
-    float baseHP;
-    TextMesh playerHPText;
+    //sound part
+    public AudioClip rangedAttackSound;
+    public AudioClip blockSound;
+    public AudioClip deathSound;
+    public AudioClip dodgeSound;
+    AudioSource audioSource;
 
     // Bullet part
     public GameObject bulletPreFab;
     public float bulletSpeed;
+
+    //player stats
+    public float HP = 100.0f;
+    public float runSpeed = 10.0f;
+    float baseHP;
+    TextMesh playerHPText;
     int ammoCapacity = 10;
     int baseAmmoCapacity;
     int playerStamina = 10;
     int basePlayerStamina;
     TextMesh ammoText;
     TextMesh playerStaminaText;
+    bool blocking = false;
 
     // Start is called before the first frame update
     void Start()
@@ -40,6 +49,8 @@ public class player : MonoBehaviour
         baseHP = HP;
         playerHPText = this.transform.Find("playerHP").GetComponent<TextMesh>();
         playerHPText.text = baseHP.ToString();
+        audioSource = GetComponent<AudioSource>();
+
     }
 
     // Update is called once per frame
@@ -56,9 +67,15 @@ public class player : MonoBehaviour
                 ammoText.text = ammoCapacity.ToString();
             }
         }
-        if (Input.GetButtonDown("Fire2"))
+        if (Input.GetButtonDown("Fire2") && playerStamina > 0)
         {
+            blocking = true;
             Block();
+            audioSource.PlayOneShot(blockSound, 1);
+        }
+        if (Input.GetButtonUp("Fire2"))
+        {
+            blocking = false;
         }
     }
     private void FixedUpdate()
@@ -69,14 +86,16 @@ public class player : MonoBehaviour
         {
             body.position = new Vector2(body.position.x, origYPosition - 1f);
         }
-        if (HP == 0f)
+    }
+    void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.tag == "projectile")
         {
-            Destroy(gameObject);
-            Application.Quit();
-            if (UnityEditor.EditorApplication.isPlaying)
+            if (!blocking)
             {
-                UnityEditor.EditorApplication.isPlaying = false;
+                reduceHP();
             }
+            Destroy(collision.gameObject);
         }
     }
     private void Shoot()
@@ -85,6 +104,7 @@ public class player : MonoBehaviour
         Physics2D.IgnoreCollision(bullet.GetComponent<Collider2D>(), GetComponent<Collider2D>());
         bullet.GetComponent<Rigidbody2D>().position = GetComponent<Rigidbody2D>().position;
         bullet.GetComponent<Rigidbody2D>().velocity = new Vector2(0f, bulletSpeed);
+        audioSource.PlayOneShot(rangedAttackSound, 1);
     }
     private void Block()
     {
@@ -96,6 +116,15 @@ public class player : MonoBehaviour
         }
         //TODO: without stamina, you cannot block
     }
+    private void reduceHP()
+    {
+        HP--;
+        playerHPText.text = HP.ToString();
+        if (HP == 0f)
+        {
+            StartCoroutine(playerDeath());
+        }
+    }
 
     IEnumerator ammoReload()
     {
@@ -103,6 +132,18 @@ public class player : MonoBehaviour
             yield return new WaitForSecondsRealtime(5);
             ammoCapacity = baseAmmoCapacity;
             ammoText.text = ammoCapacity.ToString();
+        }
+    }
+    IEnumerator playerDeath()
+    {
+        audioSource.PlayOneShot(deathSound, 1);
+        Time.timeScale = 0;
+        yield return new WaitForSecondsRealtime(1);
+        Destroy(gameObject);
+        Application.Quit();
+        if (UnityEditor.EditorApplication.isPlaying)
+        {
+            UnityEditor.EditorApplication.isPlaying = false;
         }
     }
 }
