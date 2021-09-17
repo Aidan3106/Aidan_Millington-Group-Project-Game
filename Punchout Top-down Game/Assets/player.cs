@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class player : MonoBehaviour
 {
@@ -15,6 +16,7 @@ public class player : MonoBehaviour
     public AudioClip blockSound;
     public AudioClip deathSound;
     public AudioClip dodgeSound;
+    public AudioClip reloadSound;
     AudioSource audioSource;
 
     // Bullet part
@@ -77,6 +79,10 @@ public class player : MonoBehaviour
         {
             blocking = false;
         }
+        if (Input.GetButtonDown("Cancel"))
+        {
+            SceneManager.LoadScene("MainMenu", LoadSceneMode.Single);
+        }
     }
     private void FixedUpdate()
     {
@@ -129,21 +135,19 @@ public class player : MonoBehaviour
     IEnumerator ammoReload()
     {
         while (true) { 
-            yield return new WaitForSecondsRealtime(5);
+            yield return new WaitForSecondsRealtime(4);
+            audioSource.PlayOneShot(reloadSound, 1);
+            yield return new WaitWhile(() => audioSource.isPlaying);
             ammoCapacity = baseAmmoCapacity;
             ammoText.text = ammoCapacity.ToString();
         }
     }
     IEnumerator playerDeath()
     {
-        audioSource.PlayOneShot(deathSound, 1);
         Time.timeScale = 0;
-        yield return new WaitForSecondsRealtime(1);
-        Destroy(gameObject);
-        Application.Quit();
-        if (UnityEditor.EditorApplication.isPlaying)
-        {
-            UnityEditor.EditorApplication.isPlaying = false;
-        }
+        audioSource.PlayOneShot(deathSound, 1);
+        yield return new WaitWhile(() => audioSource.isPlaying);
+        Time.timeScale = 1;
+        SceneManager.LoadScene("MainMenu", LoadSceneMode.Single);
     }
 }

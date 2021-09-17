@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class boss : MonoBehaviour
 {
@@ -13,6 +14,7 @@ public class boss : MonoBehaviour
     //sound part
     public AudioClip getHitSound;
     public AudioClip deathSound;
+    public AudioClip rangedAttackSound;
     AudioSource audioSource;
 
     //timer to fire more projectiles
@@ -34,6 +36,7 @@ public class boss : MonoBehaviour
         bossBody = GetComponent<Rigidbody2D>();
         bossBody.velocity = new Vector2(-1 * bossMoveSpeed, 0f);
         audioSource = GetComponent<AudioSource>();
+        //audioSource.volume = 0.2f;
     }
     private void Update()
     {
@@ -54,7 +57,7 @@ public class boss : MonoBehaviour
             bossHP--;
             Destroy(collision.gameObject);
             bossHPText.text = bossHP.ToString();
-            waitTime -= 0.05f;
+            waitTime -= 0.049f;
             audioSource.PlayOneShot(getHitSound, 1);
             if (bossHP < 1)
             {
@@ -73,6 +76,7 @@ public class boss : MonoBehaviour
         Physics2D.IgnoreCollision(bullet.GetComponent<Collider2D>(), GetComponent<Collider2D>());
         bullet.GetComponent<Rigidbody2D>().position = GetComponent<Rigidbody2D>().position;
         bullet.GetComponent<Rigidbody2D>().velocity = new Vector2(0f, -bulletSpeed);
+        audioSource.PlayOneShot(rangedAttackSound, 1);
     }
     IEnumerator bossShooting()
     {
@@ -84,14 +88,10 @@ public class boss : MonoBehaviour
     }
     IEnumerator bossDeath()
     {
-        audioSource.PlayOneShot(deathSound, 1);
         Time.timeScale = 0;
-        yield return new WaitForSecondsRealtime(1);
-        Destroy(gameObject);
-        Application.Quit();
-        if (UnityEditor.EditorApplication.isPlaying)
-        {
-            UnityEditor.EditorApplication.isPlaying = false;
-        }
+        audioSource.PlayOneShot(deathSound, 1);
+        yield return new WaitWhile(() => audioSource.isPlaying);
+        Time.timeScale = 1;
+        SceneManager.LoadScene("MainMenu", LoadSceneMode.Single);
     }
 }

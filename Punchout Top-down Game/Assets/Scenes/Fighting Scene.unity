@@ -1040,6 +1040,7 @@ MonoBehaviour:
   bossHP: 10
   getHitSound: {fileID: 8300000, guid: 3c1de37cebcea604ea909699a74755e2, type: 3}
   deathSound: {fileID: 8300000, guid: f52c6fed93d37fb44ad46fa88c230794, type: 3}
+  rangedAttackSound: {fileID: 8300000, guid: ff4671b59952f4a43a9cef6535124bee, type: 3}
   bulletPreFab: {fileID: 801986991683883195, guid: 0072c5e58ed80af47bfd59290379988f, type: 3}
 --- !u!82 &1819827894
 AudioSource:
@@ -1053,7 +1054,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0.1
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -1400,6 +1401,7 @@ MonoBehaviour:
   blockSound: {fileID: 8300000, guid: e16b4f27852219b4880572578262aa69, type: 3}
   deathSound: {fileID: 8300000, guid: cf51b91678e931341988a5122e3f4ae5, type: 3}
   dodgeSound: {fileID: 8300000, guid: 13ef071463f70d241bc6cd223b0871a5, type: 3}
+  reloadSound: {fileID: 8300000, guid: 55fcc33c9261b834cab7c22926733060, type: 3}
   bulletPreFab: {fileID: 801986991683883195, guid: 262f6de19a8c87b488e8901acd27d5ae, type: 3}
   bulletSpeed: 10
   HP: 10
