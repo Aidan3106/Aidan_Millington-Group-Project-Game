@@ -8,6 +8,11 @@ TagManager:
   - boss
   - projectile
   - player
+  - bossGoDown
+  - bossGoUp
+  - bossGoRight
+  - bossGoLeft
+  - bossGoRandom
   layers:
   - Default
   - TransparentFX
@@ -19,9 +24,9 @@ TagManager:
   - 
   - 
   - 
-  - 
-  - 
-  - 
+  - boss
+  - player
+  - map
   - 
   - 
   - 

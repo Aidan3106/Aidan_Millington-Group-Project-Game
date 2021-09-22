@@ -10,6 +10,7 @@ public class player : MonoBehaviour
     float horizontal;
     float vertical;
     float origYPosition;
+    string sceneName;
 
     //sound part
     public AudioClip rangedAttackSound;
@@ -24,8 +25,8 @@ public class player : MonoBehaviour
     public float bulletSpeed;
 
     //player stats
-    public float HP = 100.0f;
-    public float runSpeed = 10.0f;
+    public float HP = 10.0f;
+    public float runSpeed = 5.0f;
     float baseHP;
     TextMesh playerHPText;
     int ammoCapacity = 10;
@@ -52,7 +53,8 @@ public class player : MonoBehaviour
         playerHPText = this.transform.Find("playerHP").GetComponent<TextMesh>();
         playerHPText.text = baseHP.ToString();
         audioSource = GetComponent<AudioSource>();
-
+        sceneName = SceneManager.GetActiveScene().name;
+        //Physics2D.IgnoreCollision(.GetComponent<Collider2D>(), GetComponent<Collider2D>()); <- make the player ignore the bossmoving objects
     }
 
     // Update is called once per frame
@@ -60,7 +62,7 @@ public class player : MonoBehaviour
     {
         horizontal = Input.GetAxisRaw("Horizontal");
         vertical = Input.GetAxisRaw("Vertical");
-        if (Input.GetButtonDown("Fire1"))
+        if (Input.GetButtonDown("Fire1") && blocking == false)
         {
             if (ammoCapacity > 0)
             {
@@ -86,11 +88,24 @@ public class player : MonoBehaviour
     }
     private void FixedUpdate()
     {
+        Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         body.velocity = new Vector2(horizontal * runSpeed, 0f);
-        body.position = new Vector2(body.position.x ,origYPosition);
-        if (vertical == -1f)
-        {
-            body.position = new Vector2(body.position.x, origYPosition - 1f);
+        switch (sceneName) {
+            case "Map2":
+                transform.up = new Vector3(
+                    mousePosition.x - transform.position.x,
+                    mousePosition.y - transform.position.y,
+                    0f);
+                break;
+            case "Map3":
+            case "Map4":
+            case "Map5":
+                body.velocity = new Vector2(horizontal * runSpeed, vertical * runSpeed);
+                transform.up = new Vector3(
+                    mousePosition.x - transform.position.x,
+                    mousePosition.y - transform.position.y,
+                    0f);
+                break;
         }
     }
     void OnCollisionEnter2D(Collision2D collision)
@@ -107,9 +122,22 @@ public class player : MonoBehaviour
     private void Shoot()
     {
         GameObject bullet = Instantiate(bulletPreFab) as GameObject;
+        bullet.gameObject.layer = 11;
         Physics2D.IgnoreCollision(bullet.GetComponent<Collider2D>(), GetComponent<Collider2D>());
         bullet.GetComponent<Rigidbody2D>().position = GetComponent<Rigidbody2D>().position;
-        bullet.GetComponent<Rigidbody2D>().velocity = new Vector2(0f, bulletSpeed);
+        switch (sceneName)
+        {
+            case "Map1":
+                bullet.GetComponent<Rigidbody2D>().velocity = new Vector2(0f, bulletSpeed);
+                break;
+            case "Map2":
+            case "Map3":
+            case "Map4":
+            case "Map5":
+                bullet.GetComponent<Rigidbody2D>().velocity = new Vector2(transform.up.x * bulletSpeed, transform.up.y * bulletSpeed);
+                bullet.transform.up = transform.up;
+                break;
+        }
         audioSource.PlayOneShot(rangedAttackSound, 1);
     }
     private void Block()
@@ -134,12 +162,15 @@ public class player : MonoBehaviour
 
     IEnumerator ammoReload()
     {
-        while (true) { 
+        while (true) {
             yield return new WaitForSecondsRealtime(4);
-            audioSource.PlayOneShot(reloadSound, 1);
-            yield return new WaitWhile(() => audioSource.isPlaying);
-            ammoCapacity = baseAmmoCapacity;
-            ammoText.text = ammoCapacity.ToString();
+            if (ammoCapacity < 10)
+            {
+                audioSource.PlayOneShot(reloadSound, 1);
+                yield return new WaitWhile(() => audioSource.isPlaying);
+                ammoCapacity = baseAmmoCapacity;
+                ammoText.text = ammoCapacity.ToString();
+            }
         }
     }
     IEnumerator playerDeath()
