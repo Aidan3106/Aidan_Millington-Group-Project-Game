@@ -12,6 +12,15 @@ public class mainMenu : MonoBehaviour
         SceneManager.LoadScene(firstMap, LoadSceneMode.Single);
     }
 
+    public void controlsButton()
+    {
+        SceneManager.LoadScene("Controls", LoadSceneMode.Single);
+    }
+    public void BackButton()
+    {
+        SceneManager.LoadScene("MainMenu", LoadSceneMode.Single);
+    }
+
     public void quitGameButton()
     {
         Application.Quit();
