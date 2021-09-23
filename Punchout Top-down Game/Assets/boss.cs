@@ -13,7 +13,7 @@ public class boss : MonoBehaviour
     string sceneName;
     float horizontal;
     GameObject player;
-    Vector2[] rndDirArray;
+    GameObject[] bossGoRndPoints;
 
     //sound part
     public AudioClip getHitSound;
@@ -43,23 +43,14 @@ public class boss : MonoBehaviour
         {
             case "Map1":
             case "Map4":
-            case "Map5":
                 bossBody.velocity = new Vector2(-1 * bossMoveSpeed, 0f);
+                break;
+            case "Map5":
+                bossGoRndPoints = GameObject.FindGameObjectsWithTag("bossGoRandom");
+                bossGoTowardsRandomPoint(bossGoRndPoints);
                 break;
         }
         audioSource = GetComponent<AudioSource>();
-        rndDirArray = new Vector2[]
-            {
-                new Vector2(0f, bossMoveSpeed),//UP
-                new Vector2(bossMoveSpeed, bossMoveSpeed),//UPRIGHT
-                new Vector2(bossMoveSpeed, 0f),//RIGHT
-                new Vector2(bossMoveSpeed, -1 * bossMoveSpeed),//DOWNRIGHT
-                new Vector2(0f, -1 * bossMoveSpeed),//DOWN
-                new Vector2(-1 * bossMoveSpeed, -1 * bossMoveSpeed),//DOWNLEFT
-                new Vector2(-1 * bossMoveSpeed, 0f),//LEFT
-                new Vector2(-1 * bossMoveSpeed, bossMoveSpeed)//UPLEFT
-            };
-
     }
     private void Update()
     {
@@ -148,10 +139,9 @@ public class boss : MonoBehaviour
         {
             if (other.gameObject.tag == "bossGoRandom")
             {
-                if (other.gameObject.transform.position == bossBody.transform.position)
+                if (Mathf.Abs(other.gameObject.transform.position.x - bossBody.transform.position.x) < 0.1f & Mathf.Abs(other.gameObject.transform.position.y - bossBody.transform.position.y) < 0.1f)
                 {
-                    int rndVeloIdx = Random.Range(0, 8);
-                    bossBody.velocity = rndDirArray[rndVeloIdx];
+                    bossGoTowardsRandomPoint(bossGoRndPoints);
                 }
             }
         }
@@ -218,5 +208,12 @@ public class boss : MonoBehaviour
                 SceneManager.LoadScene("MainMenu", LoadSceneMode.Single);
                 break;
         }
+    }
+    void bossGoTowardsRandomPoint(GameObject[] points)
+    {
+        int rnd = Random.Range(0, points.Length);
+        GameObject destPoint = points[rnd];
+        Vector2 direction = new Vector2(destPoint.transform.position.x - transform.position.x, destPoint.transform.position.y - transform.position.y);
+        bossBody.velocity = new Vector2(direction.normalized.x * bossMoveSpeed, direction.normalized.y * bossMoveSpeed);
     }
 }
