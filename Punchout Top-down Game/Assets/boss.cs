@@ -199,13 +199,7 @@ public class boss : MonoBehaviour
                 SceneManager.LoadScene("Map5", LoadSceneMode.Single);
                 break;
             case "Map5":
-                SceneManager.LoadScene("Map6", LoadSceneMode.Single);
-                break;
-            case "Map6":
-                SceneManager.LoadScene("Map7", LoadSceneMode.Single);
-                break;
-            case "Map7":
-                SceneManager.LoadScene("MainMenu", LoadSceneMode.Single);
+                SceneManager.LoadScene("Credits", LoadSceneMode.Single);
                 break;
         }
     }

@@ -179,6 +179,6 @@ public class player : MonoBehaviour
         audioSource.PlayOneShot(deathSound, 1);
         yield return new WaitWhile(() => audioSource.isPlaying);
         Time.timeScale = 1;
-        SceneManager.LoadScene("MainMenu", LoadSceneMode.Single);
+        SceneManager.LoadScene("GameOver", LoadSceneMode.Single);
     }
 }
